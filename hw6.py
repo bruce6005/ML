@@ -1,28 +1,44 @@
 import cv2
 from kmeans import *
 import matplotlib.pyplot as plt
+import time
 
+imgname="img1"
 image = cv2.imread("./CV6/image1.png")
-print(np.shape(image))
+
 width, height, _ = image.shape
 
 image = image.reshape(-1, 3)
 
+start_time = time.time()
+K = kerneltwoRBF(image,image)
+D = np.diag(K.sum(axis=1))  # Degree matrix
+L_Normal = D - K
+D_inv=np.diag(1/np.diag(np.sqrt(D)))
+L_Ratio=D_inv@L_Normal@D_inv
 
-# print(width, height)
-# kernel_kmeans(image,5,width,height)
+eigvals_Normal, eigvecs_Noraml = np.linalg.eigh(L_Normal)
+eigvals_Ratio, eigvecs_Ratio = np.linalg.eigh(L_Ratio)
+end_time = time.time()
+print(f"Execution time: {end_time - start_time:.6f} seconds")
+
+# 2 - 4 cluster try
+for clusterNum in range(2,5):
+    # mode kmeans++ : 1  random : 2 
+    for init in range (1,3):
+        # normal spectral clustering
+        save_dir = "SC_Normal_" + imgname + "_Cluster" + str(clusterNum) + "_initMode_" + str(init)
+        spectral_clustering( clusterNum, width,height, save_dir, init, eigvals_Normal, eigvecs_Noraml)
+
+        # Ratio spectral clustering
+        save_dir = "SC_Ratio_" + imgname+"_Cluster" + str(clusterNum) + "_initMode_" + str(init)
+        spectral_clustering( clusterNum, width,height, save_dir, init, eigvals_Ratio, eigvecs_Ratio)
+
+        # kernel kmeans
+        save_dir = "Kmeans_" + imgname + "_Cluster" + str(clusterNum) + "_initMode_" + str(init)
+        kernel_kmeans(image, 3, width,height, save_dir, init)
 
 
-labels, centers = kernel_kmeans(image, 3,width,height)
-print(labels)
-print("")
-print(centers)
 
-centers = centers.reshape(-1, 2)
-plt.scatter(image[:, 0], image[:, 1], c=labels, cmap='viridis')
-plt.scatter(centers[:, 0], centers[:, 1], c='red', marker='x', s=200)
-plt.title('Kernel K-Means Clustering')
-plt.show()
-# Print or inspect the NumPy array
-print(image)
+
 

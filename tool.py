@@ -4,7 +4,7 @@ import csv
 import cv2
 
 colormap= np.random.choice(range(256),size=(100,3))
-
+colormap =  np.array( [(255,128,0),(128,0,255),(0,128,255),(255,0,128)])
 
 def imread(path):
     '''
@@ -34,3 +34,16 @@ def visualize(X,k,H,W):
             res[h,w,:]=colors[X[h*W+w]]
 
     return res.astype(np.uint8)
+
+def plot_eigenvector(xs,ys,zs,C,name):
+    fig=plt.figure()
+    ax=fig.add_subplot(111,projection='3d')
+    markers=['o','^','s']
+    for marker,i in zip(markers,np.arange(3)):
+        ax.scatter(xs[C==i],ys[C==i],zs[C==i],marker=marker)
+
+    ax.set_xlabel('eigenvector 1st dim')
+    ax.set_ylabel('eigenvector 2nd dim')
+    ax.set_zlabel('eigenvector 3rd dim')
+    plt.savefig(name)
+    plt.show()

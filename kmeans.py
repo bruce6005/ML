@@ -4,7 +4,7 @@ from tool import *
 from PIL import Image
 import os
 
-def kerneltwoRBF(X1, X2, spatialalpha=0.001, coloralpha=0.001):
+def kernel(X1, X2, spatialalpha=0.001, coloralpha=0.001):
 
     S=np.zeros((len(X1),2))
     for i in range(len(X1)):
@@ -41,7 +41,7 @@ def initMeans(X, k, mode):
     return Cluster
     
 def kernel_kmeans(datapoint, k_cluster, width, height,dir,initmode):
-    datapoint = kerneltwoRBF(datapoint,datapoint)
+    datapoint = kernel(datapoint,datapoint)
     kmeans(datapoint, k_cluster, width, height,dir,initmode)
 
 def kmeans(datapoint, k_cluster, width, height, dir, initmode):

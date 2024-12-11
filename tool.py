@@ -47,3 +47,4 @@ def plot_eigenvector(xs,ys,zs,C,name):
     ax.set_zlabel('eigenvector 3rd dim')
     plt.savefig(name)
     plt.show()
+

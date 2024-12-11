@@ -4,7 +4,7 @@ from tool import *
 from PIL import Image
 import os
 
-def kernel(X1, X2, spatialalpha=0.001, coloralpha=0.001):
+def kernel(X1, X2, spatialalpha=0.01, coloralpha=0.001):
 
     S=np.zeros((len(X1),2))
     for i in range(len(X1)):
@@ -36,6 +36,7 @@ def initMeans(X, k, mode):
         X_std=np.std(X,axis=0)
         for c in range(X.shape[1]):
             Cluster[:,c]=np.random.normal(X_mean[c],X_std[c],size=k)
+    
     
     
     return Cluster
@@ -73,7 +74,7 @@ def kmeans(datapoint, k_cluster, width, height, dir, initmode):
                 dist.append(np.sqrt(np.sum((datapoint[i] - Mean[j])**2)))
             centers[i]=np.argmin(dist)
         # 
-        labels = np.argmin(distances, axis=1)
+        # labels = np.argmin(distances, axis=1)
         
 
         New_Mean=np.zeros(Mean.shape)
@@ -105,8 +106,8 @@ def kmeans(datapoint, k_cluster, width, height, dir, initmode):
         
         print(cnt,loss, diff)
         cnt+=1
-
-    return labels, centers
+    # print(centers)
+    return centers, centers
 
 def spectral_clustering(k_cluster, width, height, dir, initmode, eigvals,eigvecs):
     # eigencalue count before this function

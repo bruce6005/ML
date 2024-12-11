@@ -5,8 +5,8 @@ import time
 import os
 
 
-imgname="img1"
-image = cv2.imread("./CV6/image1.png")
+imgname="img2"
+image = cv2.imread("./CV6/image2.png")
 
 width, height, _ = image.shape
 
@@ -42,7 +42,7 @@ for clusterNum in range(2,5):
 
         # kernel kmeans
         save_dir = "output/Kmeans_" + imgname + "_Cluster" + str(clusterNum) + "_initMode_" + str(init)
-        kernel_kmeans(image, init, width,height, save_dir, init)
+        kernel_kmeans(image, clusterNum, width,height, save_dir, init)
 
 
 print("\a")

@@ -5,8 +5,8 @@ import time
 import os
 
 
-imgname="img2"
-image = cv2.imread("./CV6/image2.png")
+imgname="img1"
+image = cv2.imread("./CV6/image1.png")
 
 width, height, _ = image.shape
 

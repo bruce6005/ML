@@ -1,4 +1,19 @@
+from PCA import *
+import os
+from tool import *
 # part 1.1  PCA LDA show first 25 eigen and fisher random 10 images and reconstruct
+filepath=os.path.join('Yale_Face_Database','Training')
+
+
+H,W=231,195
+X,y=imread(filepath,H,W)
+
+
+
+print(np.shape(X))
+
+Xproj, evalue, evector =  pca(X,10)      
+show_eigenface(X,25,H,W)      
 # part 1.2  reconstruction and performance k-nn to classify
 # part 1.3  kernel PCA and kernel LDA do face recognization 
 #           choose different kernel RBF XX^t

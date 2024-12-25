@@ -1,6 +1,6 @@
 #
 #  tsne.py
-#
+# 反了 我改錯地方
 # Implementation of t-SNE in Python. The implementation was tested on Python
 # 2.7.10, and it requires a working installation of NumPy. The implementation
 # comes with an example on the MNIST dataset. In order to plot the
@@ -14,8 +14,20 @@
 
 import numpy as np
 import pylab
+import matplotlib.pyplot as plt
+import os 
+import math
 
-
+def plot_similarity(P,Q):
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.title('SNE high-dim')
+    plt.hist(P.flatten(),bins=40,log=True)
+    plt.subplot(2,1,2)
+    plt.title('SNE low-dim')
+    plt.hist(Q.flatten(),bins=40,log=True)
+    plt.savefig(os.path.join('tsne_iterP500','tsne_similarity.png'.format(iter)))
+        
 def Hbeta(D=np.array([]), beta=1.0):
     """
         Compute the perplexity and the P-row for a specific value of the
@@ -122,7 +134,7 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
     # Initialize variables
     X = pca(X, initial_dims).real
     (n, d) = X.shape
-    max_iter = 1000
+    max_iter = 501
     initial_momentum = 0.5
     final_momentum = 0.8
     eta = 500
@@ -132,6 +144,8 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
     iY = np.zeros((n, no_dims))
     gains = np.ones((n, no_dims))
 
+    last_error = 10 # nonsense
+    last_C= 0
     # Compute P-values
     P = x2p(X, 1e-5, perplexity)
     P = P + np.transpose(P)
@@ -140,17 +154,19 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
     P = np.maximum(P, 1e-12)
 
     # Run iterations
-    for iter in range(max_iter):
+    for iter in range(max_iter) or last_error<1e-10:
 
         # Compute pairwise affinities
         sum_Y = np.sum(np.square(Y), 1)
         num = -2. * np.dot(Y, Y.T)
         num = 1. / (1. + np.add(np.add(num, sum_Y).T, sum_Y))
         num[range(n), range(n)] = 0.
+
+
         Q = num / np.sum(num)
         Q = np.maximum(Q, 1e-12)
-
-        # Compute gradient
+# 改這裡
+        # Compute gradient KL divergence I guess?
         PQ = P - Q
         for i in range(n):
             dY[i, :] = np.sum(np.tile(PQ[:, i] * num[:, i], (no_dims, 1)).T * (Y[i, :] - Y), 0)
@@ -171,11 +187,17 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
         if (iter + 1) % 10 == 0:
             C = np.sum(P * np.log(P / Q))
             print("Iteration %d: error is %f" % (iter + 1, C))
+            last_error = abs(C - last_C)
+            last_C =C
 
+            plt.clf()
+            plt.scatter(Y[:, 0], Y[:, 1], 20, labels)
+            plt.savefig(os.path.join('tsne_iter','iter{}.png'.format(iter)))
         # Stop lying about P-values
         if iter == 100:
             P = P / 4.
 
+    plot_similarity(P,Q)
     # Return solution
     return Y
 
@@ -186,5 +208,6 @@ if __name__ == "__main__":
     X = np.loadtxt("mnist2500_X.txt")
     labels = np.loadtxt("mnist2500_labels.txt")
     Y = tsne(X, 2, 50, 20.0)
-    pylab.scatter(Y[:, 0], Y[:, 1], 20, labels)
-    pylab.show()
+    plt.scatter(Y[:, 0], Y[:, 1], 20, labels)
+    # plt.savefig('tsne_similarity.png')
+    plt.show()
